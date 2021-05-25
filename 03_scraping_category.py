@@ -1,6 +1,6 @@
 import requests
 import csv
-import os
+from os import path, mkdir
 from bs4 import BeautifulSoup
 
 
@@ -8,6 +8,16 @@ from bs4 import BeautifulSoup
 url = "http://books.toscrape.com/catalogue/category/books_1/index.html"
 url_debut = "http://books.toscrape.com/catalogue"
 urlImage_debut = "http://books.toscrape.com"
+
+
+# Verifie qu'un dossier img est present, si oui le créé 
+dossierImg = "dossierImg"
+if path.isdir(dossierImg) :
+    print("Le repertoire d'image existe deja, pas besoin de le creer.")
+else :
+    mkdir(dossierImg)
+    print("Le repertoire image vient d'etre cree.")
+
 
 # Recuperation des donnees de la page (url)
 page = requests.get(url)
@@ -92,8 +102,7 @@ for dictName, dictUrl in dict_cat.items() :
         # image_url
         image_url = driverProduit.find("img").get("src").split("..")[-1]
         image_url = urlImage_debut + image_url
-        photo = requests.get(image_url)
-
+        
 
         # Ajout dans la liste, les donnees recoltes
         ma_liste.append([product_page_url, upc, title, price_including_tax, price_excluding_tax, number_available, product_description, category, review_rating, image_url, photo] )
@@ -107,7 +116,23 @@ for dictName, dictUrl in dict_cat.items() :
         
         for liste in ma_liste :
             ecrit.writerow({"product_page_url" : liste[0], "upc" : liste[1], "title" : liste[2], "price_including_tax" : liste[3], "price_excluding_tax": liste[4], "number_available": liste[5], "product_description": liste[6], "category":liste[7], "review_rating":liste[8], "image_url":liste[9]})
-            with open("images/" + liste[2]+ ".jpg", "wb") as f :
+
+            # cree un repertoire de categorie dans image
+            catDossier = dossierImg + "/" + dictName.replace(" ","_")[:10]
+            if not path.isdir(catDossier)    :
+                mkdir(catDossier)
+            # Telecharge les images par categorie
+            titreFichier = liste[2].replace('[A-Za-z0-9]+', '')
+            titreFichier = titreFichier.replace("?","")
+            titreFichier = titreFichier.replace(":",".")
+            titreFichier = titreFichier.replace("!",".")
+            titreFichier = titreFichier.replace(";",".")
+            titreFichier = titreFichier.replace(",",".")
+            titreFichier = titreFichier.replace("/",".")
+            titreFichier = titreFichier.replace('"',".")
+            titreFichier = titreFichier.replace("'",".")
+            with open( catDossier + "/" + titreFichier[:10] + ".jpg", "wb") as f :
+                photo = requests.get(liste[9])
                 f.write(photo.content)
                 f.close()
         
