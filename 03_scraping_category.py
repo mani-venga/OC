@@ -138,7 +138,7 @@ for dictName, dictUrl in dict_cat.items() :
         
         csvfile.close()
 
-# Cree un repertoire image s'il n'existe pas
-# Corriger le nom de fichier long des images -> OSError: [Errno 22] Invalid argument: 'images/orange: The Complete Collection 1 (orange: The Complete Collection #1).jpg'
 # ajouter le module dans requirements
 # Ajouter dans le GIT HUB
+# Tester dans un nouvel environnement
+# Renommer le package pour OCR
